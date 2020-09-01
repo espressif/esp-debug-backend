@@ -362,6 +362,26 @@ class Gdb(object):
         # for PC we'll get something like '0x400e0db8 <gpio_set_direction>'
         return self.extract_exec_addr(sval)
 
+    def set_reg(self, nm, val):
+        return self.data_eval_expr('$%s=%s' % (nm, str(val)))
+
+    def get_reg_names(self, reg_no=[]):
+        # -data-list-register-names [ ( regno )+ ]
+        res, res_body = self._mi_cmd_run('-data-list-register-names %s' % ' '.join(str(x) for x in reg_no))
+        if res == "done" and 'register-names' in res_body:
+            return res_body['register-names']
+        else:
+            raise DebuggerError('Failed to get registers names!')
+
+    def get_reg_values(self, fmt, skip_unavailable=False, reg_no=[]):
+        #  -data-list-register-values [ --skip-unavailable ] fmt [ ( regno )*]
+        res, res_body = self._mi_cmd_run('-data-list-register-values %s %s %s' % \
+                                        ('--skip-unavailable' if skip_unavailable else '', fmt, ' '.join(str(x) for x in reg_no)))
+        if res == "done" and 'register-values' in res_body:
+            return res_body['register-values']
+        else:
+            raise DebuggerError('Failed to get registers values!')
+
     def gdb_set(self, var, val):
         res, _ = self._mi_cmd_run("-gdb-set %s %s" % (var, val))
         if res != "done":
