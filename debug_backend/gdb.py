@@ -445,11 +445,20 @@ class Gdb(object):
         if res != 'done':
             raise DebuggerError('Failed to delete BP!')
 
-    def monitor_run(self, cmd, tmo=None):
-        res, resp = self._mi_cmd_run('mon %s' % cmd, tmo=tmo)
+    def monitor_run(self, cmd, tmo=None, output_type=None):
+        target_output = ''
+        def _target_stream_handler(type, stream, payload):
+            nonlocal target_output
+            if output_type == 'any' or stream == output_type:
+                target_output += payload
+        self.stream_handler_add('target', _target_stream_handler)
+        try:
+            res, resp = self._mi_cmd_run('mon %s' % cmd, tmo=tmo)
+        finally:
+            self.stream_handler_remove('target', _target_stream_handler)
         if res != 'done':
             raise DebuggerError('Failed to run monitor cmd "%s"!' % cmd)
-        return resp
+        return resp,target_output
 
     def wait_target_state(self, state, tmo=None):
         """
