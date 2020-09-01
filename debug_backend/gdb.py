@@ -52,7 +52,7 @@ class Gdb(object):
         self._resp_cache = []
         self._target_state = TARGET_STATE_UNKNOWN
         self._target_stop_reason = TARGET_STOP_REASON_UNKNOWN
-        self.stream_handlers = {'console': None, 'target': None, 'log': None}
+        self.stream_handlers = {'console': [], 'target': [], 'log': []}
         self._curr_frame = None
         self._curr_wp_val = None
         # gdb config
@@ -108,16 +108,16 @@ class Gdb(object):
             processed_recs += 1
             if rec['type'] == 'log':
                 self._logger.debug('LOG: %s', pformat(rec['payload']))
-                if self.stream_handlers['log']:
-                    self.stream_handlers['log'](rec['payload'])
+                for hnd in self.stream_handlers['log']:
+                    hnd(rec['type'], rec['stream'], rec['payload'])
             elif rec['type'] == 'console':
                 self._logger.info('CONS: %s', pformat(rec['payload']))
-                if self.stream_handlers['console']:
-                    self.stream_handlers['console'](rec['payload'])
+                for hnd in self.stream_handlers['console']:
+                    hnd(rec['type'], rec['stream'], rec['payload'])
             elif rec['type'] == 'target':
                 self._logger.debug('TGT: %s', pformat(rec['payload']))
-                if self.stream_handlers['target']:
-                    self.stream_handlers['target'](rec['payload'])
+                for hnd in self.stream_handlers['target']:
+                    hnd(rec['type'], rec['stream'], rec['payload'])
             elif rec['type'] == 'notify':
                 self._logger.info('NOTIFY: %s %s', rec['message'], pformat(rec['payload']))
                 self._on_notify(rec)
@@ -184,10 +184,19 @@ class Gdb(object):
                     res, res_body = self._parse_mi_resp(response, new_target_state)  # None, None if empty
         return res, res_body
 
-    def stream_handler_set(self, stream_type, handler):
+    def stream_handler_add(self, stream_type, handler):
         if stream_type not in self.stream_handlers:
             raise DebuggerError('Unsupported stream type "%s"' % stream_type)
-        self.stream_handlers[stream_type] = handler
+        if handler in self.stream_handlers[stream_type]:
+            return
+        self.stream_handlers[stream_type].append(handler)
+
+    def stream_handler_remove(self, stream_type, handler):
+        if stream_type not in self.stream_handlers:
+            raise DebuggerError('Unsupported stream type "%s"' % stream_type)
+        if handler not in self.stream_handlers[stream_type]:
+            return
+        self.stream_handlers[stream_type].remove(handler)
 
     def gdb_exit(self, tmo=5):
         """ -gdb-exit ~= quit """
