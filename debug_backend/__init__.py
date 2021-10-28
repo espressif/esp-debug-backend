@@ -75,6 +75,9 @@ def create_gdb(chip_name=None,
         return gdb_cls(**gdb_init_args)
     if target_triple:
         # interpret `target_triple` as normal target triple like `xtensa-esp32s2-elf`
+        if 'gdb_path' not in gdb_init_args:
+            # assume GDB path basing on target triple
+            gdb_init_args['gdb_path'] = "{}-gdb".format(target_triple)
         arch,vendor,sys,_ = _parse_target_triple(target_triple)
         if sys == 'elf':
             if arch == 'xtensa':
