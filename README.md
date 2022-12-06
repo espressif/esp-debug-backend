@@ -2,9 +2,9 @@
 
 ## Description
 
-This package provides extented capabilities to interacting with ESP chips via GDB and OpenOCD.
+This package is a library built on top of pygdbmi providing high-level API for debugging programs using GDB and OpenOCD.
 
 ## Requirements
 
 Python packages:
-- pygdbmi 
+- pygdbmi
