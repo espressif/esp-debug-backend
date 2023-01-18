@@ -56,7 +56,7 @@ class Gdb(object):
         self._curr_frame = None
         self._curr_wp_val = None
         try:
-            self._gdbmi = GdbController(command=[gdb_path])
+            self._gdbmi = GdbController(command=[gdb_path, "--nx", "--quiet", "--interpreter=mi2"])
         except TypeError:
             # fallback for pygdbmi<0.10.0.0.
             self._gdbmi = GdbController(gdb_path=gdb_path)
