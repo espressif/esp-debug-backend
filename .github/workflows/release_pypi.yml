@@ -19,7 +19,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip build setuptools twine
+        python -m pip install --upgrade pip build setuptools twine toml
 
     - name: Build and upload esp-debug-backend ${{ github.event.release.tag_name }}
       env:
