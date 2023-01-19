@@ -659,7 +659,7 @@ class Gdb(object):
                 return th
         return None
 
-    def target_program(self, **kwargs):
+    def target_program(self):
         return None
 
     def set_prog_startup_script(self, path):
