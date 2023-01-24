@@ -227,10 +227,17 @@ class Gdb(object):
 
     def gdb_exit(self, tmo=5):
         """ -gdb-exit ~= quit """
-        self._mi_cmd_run("-gdb-exit", response_on_success=["exit"], tmo=tmo)
-        with self._gdbmi_lock:
-            self._gdbmi.exit()
-            self._gdbmi = None
+        try:
+            self._mi_cmd_run("-gdb-exit", response_on_success=["exit"], tmo=tmo)
+        except NoGdbProcessError:
+            # pygdbmi<=0.10 calls `verify_valid_gdb_subprocess` before reading GDB response,
+            # 1) if after sending `-gdb-exit` to GDB it exits before we call `get_gdb_response` `NoGdbProcessError` is raised. Ignore the exception.
+            # 2) it is also safe to ignore `NoGdbProcessError` if it is raised because GDB has exited before sending `-gdb-exit`.
+            self._logger.warning('GDB had exited before `-gdb-exit` was completely processed!')
+        finally:
+            with self._gdbmi_lock:
+                self._gdbmi.exit()
+                self._gdbmi = None
 
     def console_cmd_run(self, cmd, response_on_success=["done"], tmo=5):
         """
