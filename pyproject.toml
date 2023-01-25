@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "esp-debug-backend"
-version = "1.0.1"
+version = "1.0.2"
 authors = [
   { name="Alexey Gerenkov", email="alexey.gerenkov@espressif.com" },
   { name="Andrei Gramakov", email="andrei.gramakov@espressif.com" },
@@ -31,3 +31,5 @@ dependencies = [
 [project.urls]
 "Homepage" = "https://github.com/espressif/esp-debug-backend"
 "Bug Tracker" = "https://github.com/espressif/esp-debug-backend/issues"
+"Documentation" = "https://github.com/espressif/esp-debug-backend/blob/master/README.md"
+"Changelog" = "https://github.com/espressif/esp-debug-backend/blob/master/CHANGELOG.md"
