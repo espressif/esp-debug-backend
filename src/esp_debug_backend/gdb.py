@@ -666,9 +666,6 @@ class Gdb(object):
                 return th
         return None
 
-    def target_program(self):
-        return None
-
     def set_prog_startup_script(self, path):
         """
         Set up a startup command file which will be executed in the beginning of `exec_run` method.
