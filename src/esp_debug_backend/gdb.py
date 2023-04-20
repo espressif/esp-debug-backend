@@ -518,6 +518,20 @@ class Gdb(object):
             return res_body['hw-awpt']['number']
         return None
 
+    def add_logpoint(self, loc, argument, ignore_count=0, cond='', tmp=False):
+        # -dprintf-insert [ -t ] [ -f ] [ -d ] [ -c condition ] [ -i ignore-count ]
+        # [ -p thread-id ] [ location ] [ format ]
+        # [ argument ]
+        cmd_args = '-i %d %s %s' % (ignore_count, loc, argument)
+        if len(cond):
+            cmd_args = '-c "%s" %s' % (cond, cmd_args)
+        if tmp:
+            cmd_args = "-t " + cmd_args
+        res, res_body = self._mi_cmd_run('-dprintf-insert %s' % cmd_args)
+        if res != 'done' or not res_body or 'bkpt' not in res_body or 'number' not in res_body['bkpt']:
+            raise DebuggerError('Failed to insert logpoint!')
+        return res_body['bkpt']['number']
+
     def delete_bp(self, bp):
         # -break-delete ( breakpoint )+
         res, _ = self._mi_cmd_run('-break-delete %s' % bp)
