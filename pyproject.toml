@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "esp-debug-backend"
-version = "1.0.2"
+version = "1.0.3"
 authors = [
   { name="Alexey Gerenkov", email="alexey.gerenkov@espressif.com" },
   { name="Andrei Gramakov", email="andrei.gramakov@espressif.com" },
@@ -27,6 +27,12 @@ classifiers = [
 dependencies = [
   "pygdbmi>=0.9.0.0",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+esp_debug_backend = ["hw_specific/esp_init.gdb"]
 
 [project.urls]
 "Homepage" = "https://github.com/espressif/esp-debug-backend"
